@@ -90,7 +90,6 @@ cv2.imshow('gray', bilateral_filtered_gray)
 cv2.imshow('res', res)
 
 
-
 def getMainColor(hist: bytearray) -> tuple:
     point = np.argmax(hist)
 
@@ -108,7 +107,7 @@ def getMainColor(hist: bytearray) -> tuple:
 
 
 color = getMainColor(hist)
-print (*color)
+print(*color)
 
 while 1:
     if cv2.waitKey(1) == 27:
