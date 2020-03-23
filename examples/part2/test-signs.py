@@ -1,26 +1,17 @@
-import os
-import numpy as np
+import cv2
 
-ext='jpg'
-path = '../../data/traffic-light'
+cap = cv2.VideoCapture(0)
 
-for f in os.listdir(path):
-    if f.endswith(ext):
-        print(f)
+while True:
+    ret, frame = cap.read()
+    print(ret)
 
+    cv2.imshow('Frame',frame)
 
-def getMainColor(hist: bytearray) -> tuple:
-    point = np.argmax(hist)
+    mask = cv2.inRange(frame, (100,100,0), (255,255,255))
+    cv2.imshow('Mask', mask)
 
-    color = None
+    if cv2.waitKey(1) == 27: break
 
-    if point >=0 and point <= 14 or point > 160:
-        color = 'red'
-    elif point >= 15 and point < 35:
-        color = 'yellow'
-    #elif point >= 45 and point <= 75:
-    elif point >= 36 and point <= 95:
-        color = 'green'
-
-    return color, point
-
+cap.release()
+cv2.destroyAllWindows()
