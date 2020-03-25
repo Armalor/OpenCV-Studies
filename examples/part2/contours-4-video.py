@@ -25,10 +25,12 @@ cv2.setTrackbarPos('min_v', 'result', 100)
 
 
 
-cv2.setTrackbarPos('min_h1', 'result', 1)
+cv2.setTrackbarPos('min_h1', 'result', 0)
+cv2.setTrackbarPos('max_h1', 'result', 0)
+
 cv2.setTrackbarPos('min_h2', 'result', 160)
-cv2.setTrackbarPos('max_h1', 'result', 14)
 cv2.setTrackbarPos('max_h2', 'result', 180)
+
 cv2.setTrackbarPos('max_s', 'result', 255)
 cv2.setTrackbarPos('max_v', 'result', 255)
 
@@ -57,14 +59,42 @@ while True:
 
     # Избавляемся от мелких объектов.
     # Уменньшаем контуры белых объектов: если в рамках матрицы есть "не белый" пиксель, то все становится черным.
-    matrix = (3,3)
+    matrix = (30,30)
     maskEr = cv2.erode(mask, matrix, iterations=2)
     # Обратная функции erode: если есть белый пиксель, весь контур становится белым.
-    maskDi = cv2.dilate(maskEr, matrix, iterations=8)
+    maskDi = cv2.dilate(maskEr, matrix, iterations=4)
     # Избавились.
 
     result = cv2.bitwise_and(frame, frame, mask=maskDi)
     result_hsv = cv2.bitwise_and(frame_hsv, frame_hsv, mask=maskDi)
+
+
+    # Ищем контуры
+    contours = cv2.findContours(maskDi, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    # Сами структуры контуров хранятся в начальном элементе возвращаемого значения:
+    contours = contours[0]
+
+    # Их, кстати, может и не быть:
+    if contours:
+        # Сортируем по убыванию площади контура — хотим один самый большой:
+        contours = sorted(contours, key=cv2.contourArea, reverse=True)
+
+        # Третий аргумент — это индекс контура, который мы хотим вывести. Мы хотим самый большой.
+        # Вывести все можно, передав -1 вместо 0:
+        cv2.drawContours(result, contours, 0, (255, 0, 0), 3)
+
+        # Получаем прямоугольник, обрамляющий нащ контур:
+        (x, y, w, h) = cv2.boundingRect(contours[0])
+
+        # И выводим его:
+        cv2.rectangle(result, (x, y), (x+w, y+h), (0, 255, 0), 2)
+
+
+        # Аналогично строим минимальную описанную вокруг наибольшего контура окружность:
+        (x, y), radius = cv2.minEnclosingCircle(contours[0])
+        center = (int(x), int(y))
+        radius = int(radius)
+        cv2.circle(result, center, radius, (0, 255, 0), 2)
 
     cv2.imshow('mask', mask)
     cv2.imshow('maskDi', maskDi)
