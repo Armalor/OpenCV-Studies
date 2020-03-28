@@ -1,6 +1,6 @@
 import cv2
 
-ranges = {'min_h1': [98, 180], 'max_h1': [108, 180]}
+ranges = {'min_h1': [98, 180], 'max_h1': [108, 180], 'min_h2': [118,180], 'max_h2': [165, 180]}
 
 
 def setHandlerToTrackbar(name):
@@ -25,9 +25,6 @@ for name in ranges:
 
 
 
-cv2.createTrackbar('min_h2', 'result', 0, 180, doNothing)
-cv2.createTrackbar('max_h2', 'result', 0, 180, doNothing)
-
 cv2.createTrackbar('min_s', 'result', 0, 255, doNothing)
 cv2.createTrackbar('max_s', 'result', 0, 255, doNothing)
 
@@ -41,11 +38,6 @@ cv2.createTrackbar('max_v', 'result', 0, 255, doNothing)
 for name, value in ranges.items():
     cv2.setTrackbarPos(name, 'result', value[0])
 
-#cv2.setTrackbarPos('min_h1', 'result', 98)
-#cv2.setTrackbarPos('max_h1', 'result', 108)
-
-cv2.setTrackbarPos('min_h2', 'result', 118)
-cv2.setTrackbarPos('max_h2', 'result', 165)
 
 cv2.setTrackbarPos('min_s', 'result', 110)
 cv2.setTrackbarPos('max_s', 'result', 255)
@@ -65,8 +57,8 @@ while True:
     #min_h1 = cv2.getTrackbarPos('min_h1', 'result')
     #max_h1 = cv2.getTrackbarPos('max_h1', 'result')
 
-    min_h2 = cv2.getTrackbarPos('min_h2', 'result')
-    max_h2 = cv2.getTrackbarPos('max_h2', 'result')
+    #min_h2 = cv2.getTrackbarPos('min_h2', 'result')
+    #max_h2 = cv2.getTrackbarPos('max_h2', 'result')
 
     min_s = cv2.getTrackbarPos('min_s', 'result')
     max_s = cv2.getTrackbarPos('max_s', 'result')
@@ -75,7 +67,7 @@ while True:
     max_v = cv2.getTrackbarPos('max_v', 'result')
 
     mask1 = cv2.inRange(frame_hsv, (ranges['min_h1'][0], min_s, min_v), (ranges['max_h1'][0], max_s, max_v))
-    mask2 = cv2.inRange(frame_hsv, (min_h2, min_s, min_v), (max_h2, max_s, max_v))
+    mask2 = cv2.inRange(frame_hsv, (ranges['min_h2'][0], min_s, min_v), (ranges['max_h2'][0], max_s, max_v))
     mask = cv2.bitwise_or(mask1, mask2)
 
 
@@ -88,8 +80,6 @@ while True:
     # Избавились.
 
     result = cv2.bitwise_and(frame, frame, mask=maskDi)
-    result_hsv = cv2.bitwise_and(frame_hsv, frame_hsv, mask=maskDi)
-
 
     # Ищем контуры
     contours = cv2.findContours(maskDi, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
