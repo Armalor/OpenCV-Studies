@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 signsFiles = [
-    '../../../data/road-signs/approaching-a-pedestrian-crossign.jpg',
+    '../../../data/road-signs/approaching-a-pedestrian-crossing.jpg',
     '../../../data/road-signs/footpath.jpg',
     '../../../data/road-signs/left-turn.jpg',
     '../../../data/road-signs/no-overtaking.jpg',
@@ -19,16 +19,13 @@ for i in range(len(signsFiles)):
     filename = os.path.basename(file)
     filename = os.path.splitext(filename)[0]
 
-
     sign = cv2.imread(file)
     sign = imutils.resize(sign, width=128, height=128)
 
     hsv = cv2.cvtColor(sign, cv2.COLOR_BGR2HSV)
 
     mask_blue = cv2.inRange(hsv, np.array([98, 50, 100]), np.array([108, 255, 255]))
-
     mask_black = cv2.inRange(hsv, np.array([0, 0, 0]), np.array([255, 10, 10]))
-
     # определить диапазон и маску красного цвета в HSV (красный цвет с обоих концов, поэтому маски красного - две)
     mask_r0 = cv2.inRange(hsv, np.array([0, 150, 150]), np.array([14, 255, 255]))
     mask_r1 = cv2.inRange(hsv, np.array([160, 150, 150]), np.array([180, 255, 255]))
@@ -132,7 +129,7 @@ while True:
 
 
         # Аналогично строим минимальную описанную вокруг наибольшего контура окружность:
-        (x1, y1), radius = cv2.minEnclosignCircle(contours[0])
+        (x1, y1), radius = cv2.minEnclosingCircle(contours[0])
         center = (int(x1), int(y1))
         radius = int(radius)
         cv2.circle(result, center, radius, (0, 255, 0), 1)
