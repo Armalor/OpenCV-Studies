@@ -7,48 +7,38 @@ width = 800
 height = 800
 
 background = np.zeros((width, height, 3)).astype(np.uint8)
+
 background[:] = (55, 75, 55)
+
+# Рисуем оси системы координат (начало координат — в центре экрана)
 cv2.line(background, (width//2, 0), (width//2, height), (100, 100, 100), 1)
 cv2.line(background, (0, height//2), (width, height//2), (100, 100, 100), 1)
 
 
 img = np.zeros((width, height, 3)).astype(np.uint8)
-#img[:] = (49, 49, 49)
-# Start coordinate, here (0, 0)
-# represents the top left corner of image
-start_point = np.array([0, 0])
 
-# End coordinate, here (250, 250)
-# represents the bottom right corner of image
-end_point = np.array([15, 300])
-
-color = (254, 254, 254)
-
-# Line thickness of 9 px
-thickness = 5
+thickness = 50
 
 
 def transposition(point: np.array):
-
     scale = np.array([1,-1])
     trans = np.array([width//2, height//2])
-
     return point*scale+trans
 
 
 def rotation(point: np.array, theta_deg):
-
     theta = math.radians(theta_deg)
 
-    matrix = np.array([
+    rotate_matrix = np.array([
         [math.cos(theta), math.sin(theta)],
         [-math.sin(theta), math.cos(theta)]
     ])
 
-    ret = matrix.dot(point)
+    ret = rotate_matrix.dot(point)
     return ret.astype(np.int16)
 
 
+# Собственно, наша «дорога» — трапеция:
 figure = [
     (-200, -700),
     (200, -700),
@@ -61,27 +51,29 @@ delta = 1.0
 
 while True:
 
-    pallete = img.copy()
+    palette = img.copy()
 
     for p in range(0, len(figure)):
         start = figure[p]
         finish = figure[(p+1) % len(figure)]
 
+        # Повернули точки на нужный угол
         start = rotation(start, angle)
         finish = rotation(finish, angle)
 
+        # И потом переместили их относительно экранной системы координат:
         start = transposition(start)
         finish = transposition(finish)
 
-        cv2.line(pallete, tuple(start), tuple(finish), (255, 255, 254), thickness)
+        cv2.line(palette, tuple(start), tuple(finish), (255, 255, 254), thickness)
 
-    hsv = cv2.cvtColor(pallete, cv2.COLOR_BGR2HSV)
+    hsv = cv2.cvtColor(palette, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, np.array([0, 1, 1]), np.array([180, 255, 255]))
 
+    # Оставляем те части фона, где нет рисунка:
     res = cv2.bitwise_and(background, background, mask=~mask)
-    res = cv2.bitwise_or(pallete, background, mask=None)
-
-    res1 = cv2.bitwise_and(background,background, mask=None)
+    # Накладываем рисунок на фон:
+    res = cv2.bitwise_or(palette, background, mask=None)
 
     cv2.imshow('res', res)
     cv2.imshow('mask', mask)
