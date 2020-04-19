@@ -8,8 +8,8 @@ height = 800
 
 background = np.zeros((width, height, 3)).astype(np.uint8)
 background[:] = (55, 75, 55)
-cv2.line(background, (width//2, 0), (width//2, height), (255,255,255), 1)
-cv2.line(background, (0, height//2), (width, height//2), (255,255,255), 1)
+cv2.line(background, (width//2, 0), (width//2, height), (100, 100, 100), 1)
+cv2.line(background, (0, height//2), (width, height//2), (100, 100, 100), 1)
 
 
 img = np.zeros((width, height, 3)).astype(np.uint8)
@@ -22,10 +22,10 @@ start_point = np.array([0, 0])
 # represents the bottom right corner of image
 end_point = np.array([15, 300])
 
-color = (255, 0, 0)
+color = (254, 254, 254)
 
 # Line thickness of 9 px
-thickness = 2
+thickness = 5
 
 
 def transposition(point: np.array):
@@ -36,55 +36,74 @@ def transposition(point: np.array):
     return point*scale+trans
 
 
-def rotation(point: np.array, teta_deg):
-    teta = math.radians(teta_deg)
+def rotation(point: np.array, theta_deg):
 
+    theta = math.radians(theta_deg)
 
     matrix = np.array([
-        [math.cos(teta), math.sin(teta)],
-        [-math.sin(teta), math.cos(teta)]
+        [math.cos(theta), math.sin(theta)],
+        [-math.sin(theta), math.cos(theta)]
     ])
 
     ret = matrix.dot(point)
-    return ret.astype(np.uint16)
+    return ret.astype(np.int16)
 
 
-start_point1 = start_point
-end_point1 = rotation(end_point, 22.5)
+figure = [
+    (-200, -700),
+    (200, -700),
+    (25, 300),
+    (-25, 300),
+]
 
-start_point2 = start_point
-end_point2 = rotation(end_point, 45)
-
+angle = 0.0
+delta = 1.0
 
 while True:
 
-    start_point = transposition(start_point)
-    start_point1 = transposition(start_point1)
-    start_point2 = transposition(start_point2)
+    pallete = img.copy()
 
-    end_point = transposition(end_point)
-    end_point1 = transposition(end_point1)
-    end_point2 = transposition(end_point2)
+    for p in range(0, len(figure)):
+        start = figure[p]
+        finish = figure[(p+1) % len(figure)]
 
+        start = rotation(start, angle)
+        finish = rotation(finish, angle)
 
+        start = transposition(start)
+        finish = transposition(finish)
 
-    cv2.line(img, tuple(start_point), tuple(end_point), color, thickness)
-    cv2.line(img, tuple(start_point1), tuple(end_point1), (0, 255, 0), thickness)
-    cv2.line(img, tuple(start_point2), tuple(end_point2), (0, 0, 255), thickness)
+        cv2.line(pallete, tuple(start), tuple(finish), (255, 255, 254), thickness)
 
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    mask = cv2.inRange(hsv, np.array([0, 100, 100]), np.array([255, 255, 255]))
+    hsv = cv2.cvtColor(pallete, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(hsv, np.array([0, 1, 1]), np.array([180, 255, 255]))
 
     res = cv2.bitwise_and(background, background, mask=~mask)
-    res = cv2.bitwise_or(img, background, mask=None)
+    res = cv2.bitwise_or(pallete, background, mask=None)
 
     res1 = cv2.bitwise_and(background,background, mask=None)
 
     cv2.imshow('res', res)
     cv2.imshow('mask', mask)
 
-    key = cv2.waitKey(1)
+    key = cv2.waitKeyEx(1)
+
+    # Вправо:
+    if key == 2555904:
+        angle += delta
+    # Влево:
+    elif key == 2424832:
+        angle -= delta
+    # Вниз:
+    elif key == 2621440:
+        delta -= 1 if delta > 0 else delta
+        print(delta)
+    # Вверх:
+    elif key == 2490368:
+        delta += 1
+        print(delta)
+
     if key == 27:
-        break;
+        break
 
 cv2.destroyAllWindows()
