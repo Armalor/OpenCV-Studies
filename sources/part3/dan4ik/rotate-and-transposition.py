@@ -61,7 +61,7 @@ def where_to_turn(res):
     #             right += 1
     # print(left)
     # print(right)
-    width = 800
+    width = res.shape[1]
     left = res[:width//2,:width//2].sum()
     right = res[:width//2,width//2:].sum()
     dif = left/right
