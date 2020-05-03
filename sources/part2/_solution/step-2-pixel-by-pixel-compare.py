@@ -110,10 +110,10 @@ while True:
     # Ищем контуры
     contours = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     # Сами структуры контуров хранятся в начальном элементе возвращаемого значения:
-    contours = contours[0]
+    contours = contours[1]
 
     # Их, кстати, может и не быть:
-    if contours:
+    if len(contours)>0:
         # Сортируем по убыванию площади контура — хотим один самый большой:
         contours = sorted(contours, key=cv2.contourArea, reverse=True)
 
