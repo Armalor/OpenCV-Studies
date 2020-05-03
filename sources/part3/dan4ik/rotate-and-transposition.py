@@ -61,18 +61,15 @@ def where_to_turn(res):
     #             right += 1
     # print(left)
     # print(right)
-    width = 800
-    left = res[:width//2,:width//2].sum()
-    right = res[:width//2,width//2:].sum()
+
+    height = res.shape[0]
+    width = res.shape[1]
+
+    left = res[:height//2, :width//2].sum()
+    right = res[:height//2, width//2:].sum()
     dif = left/right
     print(dif)
-    #2051985
-    if dif > 1.1:
-        return 'right'
-    elif dif < 0.9:
-        return 'left'
-    else:
-        return None
+    return dif
 
 
 
@@ -128,10 +125,10 @@ while True:
         flag = True
     if flag:
         direct = where_to_turn(mask)
-        if direct == 'right':
-            angle += delta
-        elif direct == 'left':
-            angle -= delta
+        if direct > 1.1:
+            angle += direct
+        elif direct < 0.9:
+            angle -= 1/direct
         else:
             flag = False
 
