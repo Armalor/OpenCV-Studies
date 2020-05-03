@@ -33,8 +33,15 @@ def returning(mask):
     hist_left = cv2.calcHist([mask_left], [0], None, [255], [10, 256])
     hist_right = cv2.calcHist([mask_right], [0], None, [255], [10, 256])
 
-    print(max(hist_left))
-    print(max(hist_right))
+    left = int(list(max(hist_left))[0])
+    right = int(list(max(hist_right))[0])
+
+    if left-right > 0:
+        return 'left'
+    elif left-right < 0:
+        return 'right'
+    else:
+        return None
 
     plt.plot(hist_right, color='red',marker = 'X')
     plt.plot(hist_left, color='yellow', marker='o')
@@ -119,7 +126,14 @@ while True:
         delta += 1
         # print(delta)
     elif key == ord(' '):
-           returning(mask)
+        result = returning(mask)
+        print(result)
+        if result == 'right':
+            angle -= delta
+        elif result == 'left':
+            angle += delta
+        elif result == None:
+            pass
 
     if key == 27:
         break
