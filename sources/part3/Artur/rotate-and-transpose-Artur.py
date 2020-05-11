@@ -36,12 +36,14 @@ def returning(mask):
     left = int(list(max(hist_left))[0])
     right = int(list(max(hist_right))[0])
 
+    #print(left-right)
+
     if left-right > 0:
-        return 'left'
+        return ['left',left-right]
     elif left-right < 0:
-        return 'right'
+        return ['right',left-right]
     else:
-        return None
+        return [None,None]
 
     plt.plot(hist_right, color='red',marker = 'X')
     plt.plot(hist_left, color='yellow', marker='o')
@@ -127,12 +129,14 @@ while True:
         # print(delta)
     elif key == ord(' '):
         result = returning(mask)
-        print(result)
-        if result == 'right':
-            angle -= delta
-        elif result == 'left':
-            angle += delta
-        elif result == None:
+        print(result[1])
+        delta_x = 4/(1 + np.exp(-(abs(result[1]) - 18436)/18000))
+        print(delta_x)
+        if result[0] == 'right':
+            angle -= delta_x
+        elif result[0] == 'left':
+            angle += delta_x
+        elif result[0] == None:
             pass
 
     if key == 27:
