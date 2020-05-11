@@ -4,7 +4,7 @@ import numpy as np
 import math
 
 width = 800
-height = 800
+height = 600
 
 background = np.zeros((width, height, 3)).astype(np.uint8)
 
@@ -49,6 +49,7 @@ figure = [
 angle = 0.0
 delta = 1.0
 
+
 while True:
 
     palette = img.copy()
@@ -77,6 +78,16 @@ while True:
 
     cv2.imshow('res', res)
     cv2.imshow('mask', mask)
+
+    roi0 = res[:width//2,:height//2]
+    roi1 = res[width//2:,:height//2]
+    roi2 = res[:width//2,height//2:]
+    roi3 = res[width//2:,height//2:]
+
+    cv2.imshow('roi0', roi0)
+    cv2.imshow('roi1', roi1)
+    cv2.imshow('roi2', roi2)
+    cv2.imshow('roi3', roi3)
 
     key = cv2.waitKeyEx(1)
 
