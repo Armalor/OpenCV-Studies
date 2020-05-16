@@ -3,6 +3,7 @@ import time
 import numpy as np
 import cv2
 import imutils
+import classes.keyboardEmu as kbe
 
 # Ждем три секунды, успеваем переключиться на окно:
 print('waiting for 2 seconds...')
