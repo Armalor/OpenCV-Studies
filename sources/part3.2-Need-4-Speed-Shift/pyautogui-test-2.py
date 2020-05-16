@@ -12,6 +12,10 @@ time.sleep(2)
 #ВНИМАНИЕ! PyAutoGUI НЕ ЧИТАЕТ В JPG!
 title = './nfs-shift-title.png'
 
+# ВНИМАНИЕ!  У вас, скорее всего, будет другое разрешение, т.к. у меня 4К-монитор!
+# Здесь надо выставить те параметры, которые вы задали в игре.
+window_resolution = (1920, 1080)
+
 nfs_window_location = None
 searching_attempt = 1
 while searching_attempt <= 5:
@@ -82,9 +86,7 @@ def getMask (hsv):
     return mask1
 
 while True:
-    # ВНИМАНИЕ!  У вас, скорее всего, будет другое разрешение, т.к. у меня 4К-монитор!
-    # Здесь надо выставить те параметры, которые вы задали в игре.
-    window_resolution = (1920, 1080)
+
     pix = pyautogui.screenshot(region=(left, top, window_resolution[0], window_resolution[1]))
     numpix = cv2.cvtColor(np.array(pix), cv2.COLOR_RGB2BGR)
 
@@ -170,11 +172,11 @@ while True:
         cv2.line(result_copy, (start_y, start_x), (start_y, y+h//2), (255, ), 2)
 
 
-    #cv2.imshow('mask', imutils.resize(mask, width=1600, height=900))
+    cv2.imshow('mask', imutils.resize(mask, width=1600, height=900))
 
-    #cv2.imshow('h', imutils.resize(hsv[:,:,0], width=800, height=450))
-    #cv2.imshow('s', imutils.resize(hsv[:,:,1], width=800, height=450))
-    #cv2.imshow('v', imutils.resize(hsv[:,:,2], width=800, height=450))
+    cv2.imshow('h', imutils.resize(hsv[:,:,0], width=800, height=450))
+    cv2.imshow('s', imutils.resize(hsv[:,:,1], width=800, height=450))
+    cv2.imshow('v', imutils.resize(hsv[:,:,2], width=800, height=450))
 
 
     cv2.imshow('result', imutils.resize(result_copy, width=1600, height=900))
