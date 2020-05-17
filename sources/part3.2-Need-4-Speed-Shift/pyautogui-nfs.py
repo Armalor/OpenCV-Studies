@@ -4,6 +4,7 @@ import numpy as np
 import cv2
 import imutils
 import classes.keyboardEmu as kbe
+import threading
 
 # Ждем три секунды, успеваем переключиться на окно:
 print('waiting for 2 seconds...')
@@ -40,6 +41,7 @@ if nfs_window_location is None:
 left = nfs_window_location[0]
 top = nfs_window_location[1]+nfs_window_location[3]
 
+window = (left, top, left+window_resolution[0], top+window_resolution[1])
 
 ranges = {
     'min_h1': [0,  180],
@@ -54,10 +56,11 @@ ranges = {
 
 
     'min_v':  [0,   255],
-    'max_v':  [165, 255],  # Видим только дорогу
+    'max_v':  [118, 255],  # Видим только дорогу
 
     'matrix':  [9, 255],
-    'tresh':  [42, 255],
+    'tresh':  [8, 255],
+    'iterations':  [8, 64],
 
     'wheel':  [0,1]
 }
@@ -74,7 +77,7 @@ def set_handler_to_trackbar(name):
 cv2.namedWindow('result')
 
 for name, value in ranges.items():
-    cv2.createTrackbar(name, 'result', 1 if name in ['matrix', 'tresh'] else 0, ranges[name][1], set_handler_to_trackbar(name))
+    cv2.createTrackbar(name, 'result', 1 if name in ['matrix', 'tresh', 'iterations'] else 0, ranges[name][1], set_handler_to_trackbar(name))
     cv2.setTrackbarPos(name, 'result', value[0])
 
 
@@ -84,6 +87,30 @@ def getMask (hsv):
     #mask2 = cv2.inRange(hsv, (ranges['min_h2'][0], ranges['min_s'][0], ranges['min_v'][0]), (ranges['max_h2'][0], ranges['max_s'][0], ranges['max_v'][0]))
     #return cv2.bitwise_or(mask1, mask2)
     return mask1
+
+command = None
+
+
+def wheel():
+    while True:
+        #time.sleep(1)
+        mouse = pyautogui.position()
+        mouse_at_window = mouse[0] >= window[0] and mouse[0] <= window[2] and mouse[1] >= window[1] and mouse[1] <= window[3]
+
+        if ranges['wheel'][0] == 1 and mouse_at_window:
+            if 'l' == command:
+                kbe.keyPress(kbe.SC_LEFT)
+                kbe.keyPress(kbe.SC_DOWN, 0.1)
+            elif 'l' == command:
+                kbe.keyPress(kbe.SC_RIGHT)
+                kbe.keyPress(kbe.SC_DOWN, 0.1)
+            elif 'f' == command:
+                kbe.keyPress(kbe.SC_UP, 0.1)
+
+            kbe.keyPress(kbe.SC_UP, 0.1)
+
+Control = threading.Thread(target=wheel)
+Control.start()
 
 while True:
 
@@ -107,17 +134,23 @@ while True:
     matrix = (ranges['matrix'][0], ranges['matrix'][0])
 
     # Избавляемся от мелких объектов.
-    # Уменньшаем контуры белых объектов: если в рамках матрицы есть "не белый" пиксель, то все становится черным.
-    # Не работает вообще. Тестировать.
-    # result_copy = cv2.erode(result_copy, matrix, iterations=2)
+
     # Обратная функции erode: если есть белый пиксель, весь контур становится белым.
     # Аналогично не работает.
-    # result_copy = cv2.dilate(result_copy, matrix, iterations=8)
+    result_copy = cv2.dilate(result_copy, matrix, iterations=ranges['iterations'][0])
 
+    # Уменньшаем контуры белых объектов: если в рамках матрицы есть "не белый" пиксель, то все становится черным.
+    # Не работает вообще. Тестировать.
+    result_copy = cv2.erode(result_copy, matrix, iterations=ranges['iterations'][0])
+
+
+    # BLUR
     # В районе 45-45 просто отличный результат:
-    result_copy = cv2.blur(result_copy, matrix)
+    # result_copy = cv2.blur(result_copy, matrix)
     # около 9 оптимум, более не надо.
     ret, result_copy = cv2.threshold(result_copy, ranges['tresh'][0], 150, cv2.THRESH_BINARY)
+    # ~BLUR
+
 
     # Дает обратный эффект, надо исследовать.
     # result_copy = cv2.adaptiveThreshold(result_copy, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 15)
@@ -162,12 +195,15 @@ while True:
             #print(start_x, cx, start_y, cy)
             if normal != 0:
                 angle = np.degrees(np.arctan(tangen / normal))
-                if angle < -10:
-                    print('RIGHT: %d' % angle)
-                elif angle > 10:
-                    print('LEFT: %d' % angle)
+                if angle < -5:
+                    # print('RIGHT: %d' % angle)
+                    command = 'r'
+                elif angle > 5:
+                    # print('LEFT: %d' % angle)
+                    command = 'l'
                 else:
-                    print('forward')
+                    # print('forward')
+                    command = 'f'
 
         cv2.line(result_copy, (start_y, start_x), (start_y, y+h//2), (255, ), 2)
 
