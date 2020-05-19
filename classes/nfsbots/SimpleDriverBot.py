@@ -5,17 +5,21 @@ import threading
 class SimpleDriverBot(object):
     """Бот-водитель для NFS: Shift, простейшая версия, работающая только по величине угла отклонения от нормали"""
 
-    def __init__(self, get_data=lambda x: None):
-        self.get_data = get_data
+    def __init__(self):
         self.do_run = True
 
         self.thread = threading.Thread(target=self.run)
         self.thread.start()
 
-    def can_drive(self, outer=None):
-        if outer is not None:
-            self.can_drive = outer
-        return lambda: False
+    def get_data(self, get_data=None):
+        if get_data is not None:
+            self.get_data = get_data
+        return None
+
+    def can_drive(self, can_drive=None):
+        if can_drive is not None:
+            self.can_drive = can_drive
+        return False
 
     def run(self):
         while self.do_run:

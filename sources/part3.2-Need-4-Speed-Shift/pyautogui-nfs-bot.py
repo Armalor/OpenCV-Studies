@@ -92,7 +92,12 @@ def getMask (hsv):
 
 angle = None
 
-driver = SimpleDriverBot(lambda: angle)
+driver = SimpleDriverBot()
+
+
+@driver.get_data
+def get_data():
+    return angle
 
 
 @driver.can_drive
