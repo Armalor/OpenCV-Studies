@@ -121,6 +121,8 @@ while True:
 
     # Отрезаем нахер нижнюю половину контура — она только шумит и мешает:
     result_copy[result_copy.shape[0]//2:,:] = 0
+    # Скрываем также верхнюю треть — информации там все равно нет:
+    result_copy[:result_copy.shape[0] // 3, :] = 0
 
     # Нет эффекта
     # result_copy = cv2.bilateralFilter(result_copy, 5, 175, 175)

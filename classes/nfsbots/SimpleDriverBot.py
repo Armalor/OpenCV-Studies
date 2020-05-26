@@ -32,23 +32,23 @@ class SimpleDriverBot(object):
                     kbe.keyPress(kbe.SC_DOWN, 0.2)
                 elif angle > 25:
                     kbe.keyPress(kbe.SC_LEFT)
-                    kbe.keyPress(kbe.SC_DOWN, 0.1)
+                    kbe.keyPress(kbe.SC_DOWN, 0.15)
                 elif angle > 15:
                     kbe.keyPress(kbe.SC_LEFT)
                 elif angle > 5:
                     kbe.keyPress(kbe.SC_LEFT)
-                    kbe.keyPress(kbe.SC_UP, 0.1)
+                    kbe.keyPress(kbe.SC_UP, 0.2)
                 elif angle < -45:
                     kbe.keyPress(kbe.SC_RIGHT)
-                    kbe.keyPress(kbe.SC_DOWN, 0.2)
+                    kbe.keyPress(kbe.SC_DOWN, 0.3)
                 elif angle < -25:
                     kbe.keyPress(kbe.SC_RIGHT)
-                    kbe.keyPress(kbe.SC_DOWN, 0.1)
+                    kbe.keyPress(kbe.SC_DOWN, 0.3)
                 elif angle < -15:
                     kbe.keyPress(kbe.SC_RIGHT)
                 elif angle < -5:
                     kbe.keyPress(kbe.SC_RIGHT)
-                    kbe.keyPress(kbe.SC_UP, 0.1)
+                    kbe.keyPress(kbe.SC_UP, 0.15)
                 else:
                     kbe.keyPress(kbe.SC_UP, 0.1)
 
