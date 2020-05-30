@@ -52,16 +52,16 @@ ranges = {
     #'max_h2': [0, 180],
 
 
-    'min_s':  [0, 255],
-    'max_s':  [8, 255],  # Видим только дорогу
+    'min_s':  [3, 255],
+    'max_s':  [17, 255],  # Видим только дорогу
 
 
     'min_v':  [0,   255],
-    'max_v':  [118, 255],  # Видим только дорогу
+    'max_v':  [255, 255],  # Видим только дорогу
 
-    'matrix':  [9, 255],
-    'tresh':  [8, 255],
-    'iterations':  [8, 64],
+    #'matrix':  [9, 255],
+    #'tresh':  [8, 255],
+    #'iterations':  [8, 64],
 
     'wheel':  [0,1]
 }
@@ -119,33 +119,37 @@ while True:
     result_copy = imutils.resize(result.copy(), width=800, height=450)
     result_copy = cv2.cvtColor(result_copy, cv2.COLOR_BGR2GRAY)
 
-    # Отрезаем нахер нижнюю половину контура — она только шумит и мешает:
-    result_copy[result_copy.shape[0]//2:,:] = 0
+    # Отрезаем нижнюю часть контура — она только шумит и мешает:
+    result_copy[int(result_copy.shape[0] * 0.75):, :] = 0
     # Скрываем также верхнюю треть — информации там все равно нет:
-    result_copy[:result_copy.shape[0] // 3, :] = 0
+    result_copy[:int(result_copy.shape[0] * 0.48), :] = 0
+    # Убираем квдрат по центру, где отображаются спидометр-тахометр:
+    #result_copy[result_copy.shape[0]-150:, int(result_copy.shape[1]//2-150) : int(result_copy.shape[1]//2+150)] = 0
+    cv2.circle(result_copy, (result_copy.shape[1]//2-70, result_copy.shape[0]-100), 45, 0, 55)
+    cv2.circle(result_copy, (result_copy.shape[1]//2+70, result_copy.shape[0]-100), 45, 0, 55)
 
     # Нет эффекта
     # result_copy = cv2.bilateralFilter(result_copy, 5, 175, 175)
 
 
-    matrix = (ranges['matrix'][0], ranges['matrix'][0])
+    # matrix = (ranges['matrix'][0], ranges['matrix'][0])
 
     # Избавляемся от мелких объектов.
 
     # Обратная функции erode: если есть белый пиксель, весь контур становится белым.
     # Аналогично не работает.
-    result_copy = cv2.dilate(result_copy, matrix, iterations=ranges['iterations'][0])
+    # result_copy = cv2.dilate(result_copy, matrix, iterations=ranges['iterations'][0])
 
     # Уменньшаем контуры белых объектов: если в рамках матрицы есть "не белый" пиксель, то все становится черным.
     # Не работает вообще. Тестировать.
-    result_copy = cv2.erode(result_copy, matrix, iterations=ranges['iterations'][0])
+    # result_copy = cv2.erode(result_copy, matrix, iterations=ranges['iterations'][0])
 
 
     # BLUR
     # В районе 45-45 просто отличный результат:
     # result_copy = cv2.blur(result_copy, matrix)
     # около 9 оптимум, более не надо.
-    ret, result_copy = cv2.threshold(result_copy, ranges['tresh'][0], 150, cv2.THRESH_BINARY)
+    # ret, result_copy = cv2.threshold(result_copy, ranges['tresh'][0], 150, cv2.THRESH_BINARY)
     # ~BLUR
 
 
@@ -164,7 +168,7 @@ while True:
 
         # Третий аргумент — это индекс контура, который мы хотим вывести. Мы хотим самый большой.
         # Вывести все можно, передав -1 вместо 0:
-        cv2.drawContours(result_copy, contours, 0, (255, ), 8)
+        cv2.drawContours(result_copy, contours, 0, (255, ), 4)
         contour = contours[0]
 
         # Получаем прямоугольник, обрамляющий наш контур:
