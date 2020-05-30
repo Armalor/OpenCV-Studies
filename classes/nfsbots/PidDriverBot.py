@@ -52,14 +52,14 @@ class PidDriverBot(object):
                 if radius is None:
                     continue
 
-                gas = 0.3
-                sleep = gas / 4
-                if np.absolute(radius-self.radius_prev) > np.absolute(self.radius_prev)*0.15:
+                gas = 0.15
+                sleep = gas
+                if np.absolute(radius-self.radius_prev) > np.absolute(self.radius_prev)*0.10:
                     kbe.keyPress(kbe.SC_DOWN, sleep)
                 elif np.absolute(radius-self.radius_prev) > np.absolute(self.radius_prev)*0.05:
-                    kbe.keyPress(kbe.SC_UP, gas)
+                    kbe.keyPress(kbe.SC_UP, gas*1.5)
                 else:
-                    kbe.keyPress(kbe.SC_UP, gas*2)
+                    kbe.keyPress(kbe.SC_UP, gas)
 
                 time.sleep(sleep)
                 self.radius_prev = radius
